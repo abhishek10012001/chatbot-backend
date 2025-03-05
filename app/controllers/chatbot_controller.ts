@@ -3,13 +3,10 @@ import { ChatbotControllerInterface } from "./user_controller_interface";
 import { Logger } from "@firebase/logger";
 import * as admin from "firebase-admin";
 import { getFirestore } from "firebase-admin/firestore";
+import { getBotResponse } from "./utils/bot_response";
 
 export class ChatbotController implements ChatbotControllerInterface {
     private db = getFirestore();
-
-    getBotResponse = (userText: string) => {
-        return `Bot response to: ${userText}`;
-    };
     
     async sendMessage(req: Request, resp: Response): Promise<Response<unknown, Record<string, unknown>>> {
         const logger = new Logger("sendMessage");
@@ -25,7 +22,7 @@ export class ChatbotController implements ChatbotControllerInterface {
     
           const timestamp = Date.now().toString();
           const userMessage = { text, by: "user" };
-          const botResponse = { text: this.getBotResponse(text), by: "bot" };
+          const botResponse = { text: getBotResponse(text), by: "bot" };
           logger.info(`UserMessage: ${JSON.stringify(userMessage)}, botResponse: ${JSON.stringify(botResponse)}`);
     
           const userRef = this.db.collection("Messages").doc(userId);
@@ -117,7 +114,7 @@ export class ChatbotController implements ChatbotControllerInterface {
 
             logger.info(`Updated message details: ${JSON.stringify(messages[messageId])}`);
 
-            const botResponse = { text: this.getBotResponse(newText), by: "bot" };
+            const botResponse = { text: getBotResponse(newText), by: "bot" };
             const botResponseId = (Date.now() + 1000).toString();
             logger.info(`New bot response id: ${botResponseId}, new bot response: ${JSON.stringify(botResponse)}`);
 
