@@ -16,6 +16,7 @@ export function getBotResponse (userText: string): string {
         { keywords: ["help", "support", "assist"], response: "Sure! I can help with FAQs, troubleshooting, or general inquiries.", priority: 2 },
         { keywords: ["hello", "hi", "hey"], response: "Hello! How can I assist you today?", priority: 1 },
         { keywords: ["bye", "goodbye"], response: "Goodbye! Feel free to reach out anytime.", priority: 1 },
+        { keywords: ["thanks", "great"], response: "Thanks! Let me know in case I can help you.", priority: 1 },
         { keywords: ["weather"], response: "I can't provide live weather updates, but you can check Weather.com!", priority: 1 },
         { keywords: ["time"], response: `The current time is ${new Date().toLocaleTimeString()}.`, priority: 1 },
         { keywords: ["date"], response: `Today's date is ${new Date().toLocaleDateString()}.`, priority: 1 },
