@@ -44,14 +44,15 @@ app.post("/api/v1/sendMessage", async (req: Request, res: Response): Promise<voi
       logger.info(`UserMessage: ${JSON.stringify(userMessage)}, botResponse: ${JSON.stringify(botResponse)}`);
 
       const userRef = db.collection("Messages").doc(userId);
+      const botResponseId: string = timestamp+1000;
       await userRef.set({
         [timestamp]: userMessage,
-        [timestamp + 1000]: botResponse,
+        [botResponseId]: botResponse,
       }, { merge: true });
 
       logger.info(`Successfully replied and saved user message for userId: ${userId}`);
   
-      res.status(201).json({ message: "Message saved", id: userId});
+      res.status(200).json({ message: botResponse.text, botResponseId: botResponseId, userMessageId: timestamp});
     } catch (error) {
       console.error("Error saving message:", error);
       res.status(500).json({ error: "Internal Server Error" });
@@ -98,7 +99,7 @@ app.delete("/api/v1/deleteMessage", async (req: Request, res: Response): Promise
   logger.info(`Successfully deleted user message for messageId: ${messageId}, userId: ${userId}`);
 
   await userRef.update({ [messageId]: admin.firestore.FieldValue.delete() });
-  res.json({ success: true, message: "Message deleted" });
+  res.status(200).json({ success: true, message: "Message deleted" });
 });
 
 app.post("/api/v1/editMessage", async (req: Request, res: Response): Promise<void> => {
@@ -138,15 +139,15 @@ app.post("/api/v1/editMessage", async (req: Request, res: Response): Promise<voi
     logger.info(`Updated message details: ${JSON.stringify(messages[messageId])}`);
 
     const botResponse = { text: getBotResponse(newText), by: "bot" };
-    const botMessageId = (Date.now() + 1000).toString();
-    logger.info(`New bot response id: ${botMessageId}, new bot response: ${JSON.stringify(botResponse)}`);
+    const botResponseId = (Date.now() + 1000).toString();
+    logger.info(`New bot response id: ${botResponseId}, new bot response: ${JSON.stringify(botResponse)}`);
 
-    messages[botMessageId] = botResponse;
+    messages[botResponseId] = botResponse;
 
     await userRef.set(messages, { merge: true });
 
     logger.info(`Message ${messageId} edited successfully for userId: ${userId}`);
-    res.status(200).json({ message: "Message edited successfully" });
+    res.status(200).json({ message: botResponse.text, botResponseId: botResponseId });
   } catch (error) {
     logger.error("Error editing message:", error);
     res.status(500).json({ error: "Internal Server Error" });
