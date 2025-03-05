@@ -7,10 +7,19 @@ import { getBotResponse } from "./utils/bot_response";
 
 export class ChatbotController implements ChatbotControllerInterface {
     private db = getFirestore();
+    private SECRET_KEY: string = process.env.API_SECRET_KEY!;
     
     async sendMessage(req: Request, resp: Response): Promise<Response<unknown, Record<string, unknown>>> {
         const logger = new Logger("sendMessage");
         try {
+
+          const apiKey = req.headers["x-api-key"];
+
+          if (!apiKey || apiKey !== this.SECRET_KEY) {
+            logger.error("Invalid or missing API key");
+            return resp.status(401).json({ error: "Invalid API key" });
+          }
+
           const { text, userId } = req.body;
       
           if (!text || !userId) {
@@ -43,6 +52,14 @@ export class ChatbotController implements ChatbotControllerInterface {
     
     async deleteMessage(req: Request, resp: Response): Promise<Response<unknown, Record<string, unknown>>> {
         const logger = new Logger("deleteMessage");
+
+        const apiKey = req.headers["x-api-key"];
+
+        if (!apiKey || apiKey !== this.SECRET_KEY) {
+           logger.error("Invalid or missing API key");
+           return resp.status(401).json({ error: "Invalid API key" });
+        }
+
         const { userId, messageId } = req.body;
         
         if (!userId || !messageId) {
@@ -84,6 +101,13 @@ export class ChatbotController implements ChatbotControllerInterface {
     async editMessage(req: Request, resp: Response): Promise<Response<unknown, Record<string, unknown>>> {
         const logger = new Logger("editMessage");
         try {
+            const apiKey = req.headers["x-api-key"];
+            
+            if (!apiKey || apiKey !== this.SECRET_KEY) {
+                logger.error("Invalid or missing API key");
+                return resp.status(401).json({ error: "Invalid API key" });
+             }
+
             const { userId, messageId, newText } = req.body;
 
             if (!userId || !messageId || !newText) {
