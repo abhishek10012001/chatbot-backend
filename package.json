@@ -2,10 +2,10 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "local": "npx ts-node server.ts",
+    "local": "npx ts-node  app/server.ts",
     "build": "npx tsc"
   },
   "keywords": [],
