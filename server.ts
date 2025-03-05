@@ -1,30 +1,49 @@
 import express, { Request, Response } from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import { db } from "./firebase";
+import { getRuntimeEnv, RuntimeEnv } from "./runtime_env";
+import * as admin from "firebase-admin";
+import { getFirestore } from "firebase-admin/firestore";
 
-dotenv.config();
+const runtimeEnv: RuntimeEnv = getRuntimeEnv();
+console.log(`RuntimeEnv: ${runtimeEnv}`);
+
+dotenv.config({ path: `.env.${runtimeEnv}` });
+
+const adminApp: admin.app.App = admin.initializeApp({
+  credential: admin.credential.applicationDefault(),
+});
+
+const db = getFirestore();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.post("/api/messages", async (req: Request, res: Response): Promise<void> => {
+const getBotResponse = (userText: string) => {
+  return `Bot response to: ${userText}`;
+};
+
+app.post("/api/v1/sendMessage", async (req: Request, res: Response): Promise<void> => {
     try {
-      const { text, user }: { text: string; user: string } = req.body;
+      const { text, userId } = req.body;
   
-      if (!text || !user) {
-        res.status(400).json({ error: "Text and user are required" });
+      if (!text || !userId) {
+        res.status(400).json({ error: "UserId and text are missing" });
         return;
       }
+
+      const timestamp = Date.now().toString();
+      const userMessage = { text, by: "user" };
+      const botResponse = { text: getBotResponse(text), by: "bot" };
+
+      const userRef = db.collection("Messages").doc(userId);
+      await userRef.set({
+        [timestamp]: userMessage,
+        [Date.now() + 1000]: botResponse,
+      }, { merge: true });
   
-      const docRef = await db.collection("messages").add({
-        text,
-        user,
-        timestamp: new Date(),
-      });
-  
-      res.status(201).json({ message: "Message saved", id: docRef.id });
+      res.status(201).json({ message: "Message saved", id: userId});
     } catch (error) {
       console.error("Error saving message:", error);
       res.status(500).json({ error: "Internal Server Error" });
