@@ -19,8 +19,10 @@ expressApp.use(cors());
 expressApp.use(express.json());
 
 const PORT: number = parseInt(process.env.PORT || "5001", 10);
-expressApp.listen(PORT, () => {
+const server = expressApp.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   const apiRoutes = new ApiRoutes(expressApp);
   apiRoutes.startListening();
 });
+
+export { expressApp, server };
