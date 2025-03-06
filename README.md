@@ -37,5 +37,11 @@ npm install;
 npm run local;
 ```
 
+### How to run test cases?
+
+```base
+npm run test
+```
+
 We can make it a team practice avoid using === and only use == for null and undefined treating them as the same thing.
 Ref:- [StackOverflow](https://stackoverflow.com/questions/67472808/can-someone-explain-this-simple-concept-of-null-and-undefined-more-specifically)
