@@ -1,6 +1,17 @@
 /**
- * Helper method to generate bot reply based on priority to the user messages
+ * Generates a bot response based on the user's message by matching keywords with predefined intents.
+ * If multiple intents match, the highest priority response is returned.
+ * If no match is found, a fallback response is randomly selected.
+ *
+ * @function getBotResponse
+ * @param {string} userText - The user's input message.
+ * @returns {string} The bot's response based on keyword matching and priority.
+ *
+ * @example
+ * const response = getBotResponse("Can you automate outbound?");
+ * console.log(response); // "I can help you in automating your outbound an All-In-One, AI-First Platform powered by AI Employees"
  */
+
 export function getBotResponse (userText: string): string {
 
     const cleanedText = userText.toLowerCase().trim();

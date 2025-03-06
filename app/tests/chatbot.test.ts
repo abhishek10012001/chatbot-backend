@@ -1,3 +1,14 @@
+/**
+ * Integration tests for the Chatbot API endpoints using Jest and Supertest.
+ * 
+ * This test suite covers:
+ * - `sendMessage` API
+ * - `editMessage` API
+ * - `deleteMessage` API
+ * 
+ * The tests ensure proper validation of API key, required parameters, and expected responses.
+ */
+
 import request from "supertest";
 import { expressApp, server } from "../server";
 import { StatusCode } from "../enums/auth_status_code";
@@ -8,10 +19,12 @@ describe("Chatbot API - sendMessage", () => {
   const messageId: string = "1741269454219";
 
   /**
-   * The below test cases belong to sendMessage API
+   * Test cases for sendMessage API
    */
 
-  // When Invalid API key is used to call the API
+  /**
+   * Test: Should return 401 if API key is missing or invalid.
+   */
   it("SEND MESSAGE API - Should return 401 is invalid API key", async () => {
     const response = await request(expressApp)
       .post("/api/v1/sendMessage")
@@ -21,7 +34,9 @@ describe("Chatbot API - sendMessage", () => {
     expect(response.body).toHaveProperty("code", StatusCode.INVALID_API_KEY);
   });
 
-  // When all required parameters are not passed
+  /**
+   * Test: Should return 400 if required parameters are missing.
+   */
   it("SEND MESSAGE API - Should return 400 if missing required param", async () => {
     const response = await request(expressApp)
       .post("/api/v1/sendMessage")
@@ -32,7 +47,9 @@ describe("Chatbot API - sendMessage", () => {
     expect(response.body).toHaveProperty("code", StatusCode.MISSING_REQUIRED_PARAMETERS);
   });
 
-  // When all conditions are met to call the API
+  /**
+   * Test: Should return 200 and a bot response when sending a valid message.
+   */
   it("SEND MESSAGE API - Should return 200 and a bot response when sending a valid message", async () => {
     const response = await request(expressApp)
       .post("/api/v1/sendMessage")
@@ -48,10 +65,12 @@ describe("Chatbot API - sendMessage", () => {
   });
 
   /**
-   * The below test cases belong to editMessage API
+   * Test cases for editMessage API
    */
 
-  // When Invalid API key is used to call the API
+  /**
+   * Test: Should return 401 if API key is missing or invalid.
+   */
   it("EDIT MESSAGE API - Should return 401 is invalid API key", async () => {
     const response = await request(expressApp)
       .post("/api/v1/editMessage")
@@ -61,7 +80,9 @@ describe("Chatbot API - sendMessage", () => {
     expect(response.body).toHaveProperty("code", StatusCode.INVALID_API_KEY);
   });
 
-  // When all required parameters are not passed
+  /**
+   * Test: Should return 400 if required parameters are missing.
+   */
   it("EDIT MESSAGE API - Should return 400 if missing required param", async () => {
     const response = await request(expressApp)
       .post("/api/v1/editMessage")
@@ -72,7 +93,9 @@ describe("Chatbot API - sendMessage", () => {
     expect(response.body).toHaveProperty("code", StatusCode.MISSING_REQUIRED_PARAMETERS);
   });
 
-  // When invalid user id is passed
+  /**
+   * Test: Should return 404 if invalid user ID is passed.
+   */
   it("EDIT MESSAGE API - Should return 404 if invalid user id is passed", async () => {
     const response = await request(expressApp)
       .post("/api/v1/editMessage")
@@ -83,7 +106,9 @@ describe("Chatbot API - sendMessage", () => {
     expect(response.body).toHaveProperty("code", StatusCode.USER_NOT_FOUND);
   });
 
-  // When invalid message id is passed
+  /**
+   * Test: Should return 403 if invalid message ID is passed.
+   */
   it("EDIT MESSAGE API - Should return 403 if invalid message id is passed", async () => {
     const response = await request(expressApp)
       .post("/api/v1/editMessage")
@@ -94,7 +119,9 @@ describe("Chatbot API - sendMessage", () => {
     expect(response.body).toHaveProperty("code", StatusCode.MESSAGE_NOT_FOUND);
   });
 
-  // When all conditions are met to call the API
+  /**
+   * Test: Should return 200 and a bot response when editing a valid message.
+   */
   it("EDIT MESSAGE API - Should return 200 and a bot response when sending a valid message", async () => {
     const response = await request(expressApp)
       .post("/api/v1/editMessage")
@@ -109,10 +136,12 @@ describe("Chatbot API - sendMessage", () => {
   });
 
   /**
-   * The below test cases belong to deleteMessage API
+   * Test cases for deleteMessage API
    */
 
-  // When Invalid API key is used to call the API
+  /**
+   * Test: Should return 401 if API key is missing or invalid.
+   */
   it("DELETE MESSAGE API - Should return 401 is invalid API key", async () => {
     const response = await request(expressApp)
       .delete("/api/v1/deleteMessage")
@@ -122,7 +151,9 @@ describe("Chatbot API - sendMessage", () => {
     expect(response.body).toHaveProperty("code", StatusCode.INVALID_API_KEY);
   });
 
-  // When all required parameters are not passed
+  /**
+   * Test: Should return 400 if required parameters are missing.
+   */
   it("DELETE MESSAGE API - Should return 400 if missing required param", async () => {
     const response = await request(expressApp)
       .delete("/api/v1/deleteMessage")
@@ -133,7 +164,9 @@ describe("Chatbot API - sendMessage", () => {
     expect(response.body).toHaveProperty("code", StatusCode.MISSING_REQUIRED_PARAMETERS);
   });
 
-  // When invalid user id is passed
+  /**
+   * Test: Should return 404 if invalid user ID is passed.
+   */
   it("DELETE MESSAGE API - Should return 404 if invalid user id is passed", async () => {
     const response = await request(expressApp)
       .delete("/api/v1/deleteMessage")
@@ -144,7 +177,9 @@ describe("Chatbot API - sendMessage", () => {
     expect(response.body).toHaveProperty("code", StatusCode.USER_NOT_FOUND);
   });
 
-  // When invalid message id is passed
+  /**
+   * Test: Should return 403 if invalid message ID is passed.
+   */
   it("DELETE MESSAGE API - Should return 403 if invalid message id is passed", async () => {
     const response = await request(expressApp)
       .delete("/api/v1/deleteMessage")
@@ -155,6 +190,9 @@ describe("Chatbot API - sendMessage", () => {
     expect(response.body).toHaveProperty("code", StatusCode.MESSAGE_NOT_FOUND);
   });
 
+  /**
+   * Closes the server after tests are completed to avoid open handles.
+   */
   afterAll((done) => {
     server.close(() => {
       console.log("Server closed after tests.");

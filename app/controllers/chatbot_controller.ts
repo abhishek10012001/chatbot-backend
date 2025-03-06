@@ -8,22 +8,30 @@ import { DBCollection } from "../utils/constants";
 import { StatusCode } from "../enums/auth_status_code";
 
 /**
- * Chatbot controller handles three APIs.
- * sendMessage API
- * deleteMessage API
- * editMessage API
+ * Controller for handling chatbot-related API requests.
+ * Implements the `ChatbotControllerInterface` to manage messages exchanged with the bot.
  */
 export class ChatbotController implements ChatbotControllerInterface {
+    /** Firestore database instance */
     private db = getFirestore();
+
+    /** Secret API key for request authentication */
     private SECRET_KEY: string = process.env.API_SECRET_KEY!;
     
-    /** sendMessage API
-     * User sends message to the bot by calling this API
-     * Identity of the caller is verified by the API secret key
-     * Required params are checked to process the request
-     * A message id for the sent message and bot reply is generated. Newly generated messageId, bot reply are saved
-     * into the DB and bot reply is sent as a reponse to this API
-    */
+    /**
+     * Handles sending a message to the chatbot.
+     * - Validates the API key.
+     * - Checks if required parameters (`text` and `userId`) are present.
+     * - Generates a unique message ID for the user message and bot response.
+     * - Stores the message and bot response in Firestore.
+     * - Returns the bot's response.
+     *
+     * @async
+     * @function sendMessage
+     * @param {Request} req - The Express request object containing `text` and `userId`.
+     * @param {Response} resp - The Express response object to return the bot's reply.
+     * @returns {Promise<Response>} A response containing the bot's message and generated IDs.
+     */
     async sendMessage(req: Request, resp: Response): Promise<Response<unknown, Record<string, unknown>>> {
         const logger = new Logger("sendMessage");
         try {
@@ -80,12 +88,19 @@ export class ChatbotController implements ChatbotControllerInterface {
         }
    }
     
-   /** deleteMessage API
-     * User delets the  message sent to the bot by calling this API
-     * Identity of the caller is verified by the API secret key
-     * Required params are checked to process the request
-     * The reference of the sent message is deleted from the DB
-    */
+    /**
+     * Handles deleting a user message.
+     * - Validates the API key.
+     * - Checks if `userId` and `messageId` are provided.
+     * - Checks if the message exists in Firestore.
+     * - Deletes the message if it was sent by the user.
+     *
+     * @async
+     * @function deleteMessage
+     * @param {Request} req - The Express request object containing `userId` and `messageId`.
+     * @param {Response} resp - The Express response object confirming deletion.
+     * @returns {Promise<Response>} A response confirming message deletion.
+     */
     async deleteMessage(req: Request, resp: Response): Promise<Response<unknown, Record<string, unknown>>> {
         const logger = new Logger("deleteMessage");
 
@@ -160,13 +175,19 @@ export class ChatbotController implements ChatbotControllerInterface {
         }   
     }
 
-    /** editMessage API
-     * User edits the message he has sent to the bot by calling this API
-     * Identity of the caller is verified by the API secret key
-     * Required params are checked to process the request
-     * The existing message is edited and new bot reply is generated. Newly generated bot reply and edited message is
-     * updated in the DB and the bot reply is sent as response of this API
-    */
+    /**
+     * Handles editing a user message.
+     * - Validates the API key.
+     * - Checks if `userId`, `messageId`, and `newText` are provided.
+     * - Checks if the message exists in Firestore.
+     * - Updates the message and generates a new bot response.
+     *
+     * @async
+     * @function editMessage
+     * @param {Request} req - The Express request object containing `userId`, `messageId`, and `newText`.
+     * @param {Response} resp - The Express response object returning the updated bot response.
+     * @returns {Promise<Response>} A response containing the updated bot response.
+     */
     async editMessage(req: Request, resp: Response): Promise<Response<unknown, Record<string, unknown>>> {
         const logger = new Logger("editMessage");
         try {
