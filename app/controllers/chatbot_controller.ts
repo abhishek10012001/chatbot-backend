@@ -28,22 +28,23 @@ export class ChatbotController implements ChatbotControllerInterface {
           }
     
           logger.info(`UserId: ${userId}, text: ${text}`);
-    
-          const timestamp = Date.now().toString();
+
+          const now: number = Date.now();
+          const messageId = now.toString();
           const userMessage = { text, by: "user" };
           const botResponse = { text: getBotResponse(text), by: "bot" };
           logger.info(`UserMessage: ${JSON.stringify(userMessage)}, botResponse: ${JSON.stringify(botResponse)}`);
     
           const userRef = this.db.collection("Messages").doc(userId);
-          const botResponseId: string = timestamp+1000;
+          const botResponseId: string = (now+1000).toString();
           await userRef.set({
-            [timestamp]: userMessage,
+            [messageId]: userMessage,
             [botResponseId]: botResponse,
           }, { merge: true });
     
           logger.info(`Successfully replied and saved user message for userId: ${userId}`);
       
-          return resp.status(200).json({ message: botResponse.text, botResponseId: botResponseId, userMessageId: timestamp});
+          return resp.status(200).json({ message: botResponse.text, botResponseId: botResponseId, userMessageId: messageId});
         } catch (error) {
           console.error("Error saving message:", error);
           return resp.status(500).json({ error: "Internal Server Error" });
@@ -75,7 +76,6 @@ export class ChatbotController implements ChatbotControllerInterface {
         if (!userDoc.exists) {
             logger.error(`User doc doesn't exist for userId:${userId}`);
             return resp.status(404).json({ error: "User not found" });
-            
         }
 
         const messages = userDoc.data() || {};
@@ -102,7 +102,7 @@ export class ChatbotController implements ChatbotControllerInterface {
         const logger = new Logger("editMessage");
         try {
             const apiKey = req.headers["x-api-key"];
-            
+
             if (!apiKey || apiKey !== this.SECRET_KEY) {
                 logger.error("Invalid or missing API key");
                 return resp.status(401).json({ error: "Invalid API key" });
