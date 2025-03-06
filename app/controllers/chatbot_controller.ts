@@ -158,7 +158,6 @@ export class ChatbotController implements ChatbotControllerInterface {
                 message: "Internal Server Error" 
             });
         }   
-       
     }
 
     /** editMessage API

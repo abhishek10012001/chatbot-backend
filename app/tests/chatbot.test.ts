@@ -12,7 +12,7 @@ describe("Chatbot API - sendMessage", () => {
    */
 
   // When Invalid API key is used to call the API
-  it("Should return 401 is invalid API key", async () => {
+  it("SEND MESSAGE API - Should return 401 is invalid API key", async () => {
     const response = await request(expressApp)
       .post("/api/v1/sendMessage")
       .send({ text: "Hello!", userId });
@@ -22,7 +22,7 @@ describe("Chatbot API - sendMessage", () => {
   });
 
   // When all required parameters are not passed
-  it("Should return 400 if missing required param", async () => {
+  it("SEND MESSAGE API - Should return 400 if missing required param", async () => {
     const response = await request(expressApp)
       .post("/api/v1/sendMessage")
       .set("x-api-key", validApiKey)
@@ -33,7 +33,7 @@ describe("Chatbot API - sendMessage", () => {
   });
 
   // When all conditions are met to call the API
-  it("Should return 200 and a bot response when sending a valid message", async () => {
+  it("SEND MESSAGE API - Should return 200 and a bot response when sending a valid message", async () => {
     const response = await request(expressApp)
       .post("/api/v1/sendMessage")
       .set("x-api-key", validApiKey)
@@ -52,7 +52,7 @@ describe("Chatbot API - sendMessage", () => {
    */
 
   // When Invalid API key is used to call the API
-  it("Should return 401 is invalid API key", async () => {
+  it("EDIT MESSAGE API - Should return 401 is invalid API key", async () => {
     const response = await request(expressApp)
       .post("/api/v1/editMessage")
       .send({ newText: "Hello!", userId: userId, messageId: messageId });
@@ -62,7 +62,7 @@ describe("Chatbot API - sendMessage", () => {
   });
 
   // When all required parameters are not passed
-  it("Should return 400 if missing required param", async () => {
+  it("EDIT MESSAGE API - Should return 400 if missing required param", async () => {
     const response = await request(expressApp)
       .post("/api/v1/editMessage")
       .set("x-api-key", validApiKey)
@@ -73,7 +73,7 @@ describe("Chatbot API - sendMessage", () => {
   });
 
   // When invalid user id is passed
-  it("Should return 404 if invalid user id is passed", async () => {
+  it("EDIT MESSAGE API - Should return 404 if invalid user id is passed", async () => {
     const response = await request(expressApp)
       .post("/api/v1/editMessage")
       .set("x-api-key", validApiKey)
@@ -84,7 +84,7 @@ describe("Chatbot API - sendMessage", () => {
   });
 
   // When invalid message id is passed
-  it("Should return 403 if invalid message id is passed", async () => {
+  it("EDIT MESSAGE API - Should return 403 if invalid message id is passed", async () => {
     const response = await request(expressApp)
       .post("/api/v1/editMessage")
       .set("x-api-key", validApiKey)
@@ -95,7 +95,7 @@ describe("Chatbot API - sendMessage", () => {
   });
 
   // When all conditions are met to call the API
-  it("Should return 200 and a bot response when sending a valid message", async () => {
+  it("EDIT MESSAGE API - Should return 200 and a bot response when sending a valid message", async () => {
     const response = await request(expressApp)
       .post("/api/v1/editMessage")
       .set("x-api-key", validApiKey)
@@ -106,6 +106,53 @@ describe("Chatbot API - sendMessage", () => {
     expect(response.body).toHaveProperty("botResponseId");
     expect(response.body).toHaveProperty("message");
     expect(response.body.message).toBeTruthy();
+  });
+
+  /**
+   * The below test cases belong to deleteMessage API
+   */
+
+  // When Invalid API key is used to call the API
+  it("DELETE MESSAGE API - Should return 401 is invalid API key", async () => {
+    const response = await request(expressApp)
+      .delete("/api/v1/deleteMessage")
+      .send({ userId: userId, messageId: messageId });
+
+    expect(response.status).toBe(401);
+    expect(response.body).toHaveProperty("code", StatusCode.INVALID_API_KEY);
+  });
+
+  // When all required parameters are not passed
+  it("DELETE MESSAGE API - Should return 400 if missing required param", async () => {
+    const response = await request(expressApp)
+      .delete("/api/v1/deleteMessage")
+      .set("x-api-key", validApiKey)
+      .send({ userId: "" });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty("code", StatusCode.MISSING_REQUIRED_PARAMETERS);
+  });
+
+  // When invalid user id is passed
+  it("DELETE MESSAGE API - Should return 404 if invalid user id is passed", async () => {
+    const response = await request(expressApp)
+      .delete("/api/v1/deleteMessage")
+      .set("x-api-key", validApiKey)
+      .send({ userId: "b", messageId: "c" });
+
+    expect(response.status).toBe(404);
+    expect(response.body).toHaveProperty("code", StatusCode.USER_NOT_FOUND);
+  });
+
+  // When invalid message id is passed
+  it("DELETE MESSAGE API - Should return 403 if invalid message id is passed", async () => {
+    const response = await request(expressApp)
+      .delete("/api/v1/deleteMessage")
+      .set("x-api-key", validApiKey)
+      .send({ userId: userId, messageId: "c" });
+
+    expect(response.status).toBe(403);
+    expect(response.body).toHaveProperty("code", StatusCode.MESSAGE_NOT_FOUND);
   });
 
   afterAll((done) => {
