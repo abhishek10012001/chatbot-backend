@@ -1,5 +1,6 @@
 import request from "supertest";
 import { expressApp, server } from "../server";
+import { StatusCode } from "../enums/auth_status_code";
 
 describe("Chatbot API - sendMessage", () => {
   const validApiKey = process.env.API_SECRET_KEY!;
@@ -11,7 +12,7 @@ describe("Chatbot API - sendMessage", () => {
       .send({ text: "Hello!", userId });
 
     expect(response.status).toBe(401);
-    expect(response.body).toHaveProperty("error", "Invalid API key");
+    expect(response.body).toHaveProperty("code", StatusCode.INVALID_API_KEY);
   });
 
   it("Should return 400 if missing required param", async () => {
@@ -21,7 +22,7 @@ describe("Chatbot API - sendMessage", () => {
       .send({ text: "" });
 
     expect(response.status).toBe(400);
-    expect(response.body).toHaveProperty("error", "Missing required parameters");
+    expect(response.body).toHaveProperty("code", StatusCode.MISSING_REQUIRED_PARAMETERS);
   });
 
   it("Should return 200 and a bot response when sending a valid message", async () => {
@@ -31,6 +32,7 @@ describe("Chatbot API - sendMessage", () => {
       .send({ text: "Hello!", userId });
 
     expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty("code", StatusCode.SUCCESS);
     expect(response.body).toHaveProperty("botResponseId");
     expect(response.body).toHaveProperty("userMessageId");
     expect(response.body).toHaveProperty("message");
