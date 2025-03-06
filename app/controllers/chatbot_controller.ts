@@ -3,8 +3,8 @@ import { ChatbotControllerInterface } from "./user_controller_interface";
 import { Logger } from "@firebase/logger";
 import * as admin from "firebase-admin";
 import { getFirestore } from "firebase-admin/firestore";
-import { getBotResponse } from "./utils/bot_response";
-import { DBCollection } from "./utils/constants";
+import { getBotResponse } from "../utils/bot_response";
+import { DBCollection } from "../utils/constants";
 
 /**
  * Chatbot controller handles three APIs.
