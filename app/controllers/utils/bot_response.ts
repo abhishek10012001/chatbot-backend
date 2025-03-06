@@ -1,3 +1,6 @@
+/**
+ * Helper method to generate bot reply based on priority to the user messages
+ */
 export function getBotResponse (userText: string): string {
 
     const cleanedText = userText.toLowerCase().trim();

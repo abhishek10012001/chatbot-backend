@@ -4,11 +4,25 @@ import { Logger } from "@firebase/logger";
 import * as admin from "firebase-admin";
 import { getFirestore } from "firebase-admin/firestore";
 import { getBotResponse } from "./utils/bot_response";
+import { DBCollection } from "./utils/constants";
 
+/**
+ * Chatbot controller handles three APIs.
+ * sendMessage API
+ * deleteMessage API
+ * editMessage API
+ */
 export class ChatbotController implements ChatbotControllerInterface {
     private db = getFirestore();
     private SECRET_KEY: string = process.env.API_SECRET_KEY!;
     
+    /** sendMessage API
+     * User sends message to the bot by calling this API
+     * Identity of the caller is verified by the API secret key
+     * Required params are checked to process the request
+     * A message id for the sent message and bot reply is generated. Newly generated messageId, bot reply are saved
+     * into the DB and bot reply is sent as a reponse to this API
+    */
     async sendMessage(req: Request, resp: Response): Promise<Response<unknown, Record<string, unknown>>> {
         const logger = new Logger("sendMessage");
         try {
@@ -35,7 +49,7 @@ export class ChatbotController implements ChatbotControllerInterface {
           const botResponse = { text: getBotResponse(text), by: "bot" };
           logger.info(`UserMessage: ${JSON.stringify(userMessage)}, botResponse: ${JSON.stringify(botResponse)}`);
     
-          const userRef = this.db.collection("Messages").doc(userId);
+          const userRef = this.db.collection(DBCollection.Messages).doc(userId);
           const botResponseId: string = (now+1000).toString();
           await userRef.set({
             [messageId]: userMessage,
@@ -51,6 +65,12 @@ export class ChatbotController implements ChatbotControllerInterface {
         }
    }
     
+   /** deleteMessage API
+     * User delets the  message sent to the bot by calling this API
+     * Identity of the caller is verified by the API secret key
+     * Required params are checked to process the request
+     * The reference of the sent message is deleted from the DB
+    */
     async deleteMessage(req: Request, resp: Response): Promise<Response<unknown, Record<string, unknown>>> {
         const logger = new Logger("deleteMessage");
 
@@ -70,7 +90,7 @@ export class ChatbotController implements ChatbotControllerInterface {
 
         logger.info(`UserId:${userId}, messageID: ${messageId}`);
 
-        const userRef = this.db.collection("Messages").doc(userId);
+        const userRef = this.db.collection(DBCollection.Messages).doc(userId);
         const userDoc = await userRef.get();
         
         if (!userDoc.exists) {
@@ -98,6 +118,13 @@ export class ChatbotController implements ChatbotControllerInterface {
         return resp.status(200).json({ success: true, message: "Message deleted" });
     }
 
+    /** editMessage API
+     * User edits the message he has sent to the bot by calling this API
+     * Identity of the caller is verified by the API secret key
+     * Required params are checked to process the request
+     * The existing message is edited and new bot reply is generated. Newly generated bot reply and edited message is
+     * updated in the DB and the bot reply is sent as response of this API
+    */
     async editMessage(req: Request, resp: Response): Promise<Response<unknown, Record<string, unknown>>> {
         const logger = new Logger("editMessage");
         try {
@@ -117,7 +144,7 @@ export class ChatbotController implements ChatbotControllerInterface {
 
             logger.info(`UserId: ${userId}, messageId: ${messageId}, newText: ${newText}`);
 
-            const userRef = this.db.collection("Messages").doc(userId);
+            const userRef = this.db.collection(DBCollection.Messages).doc(userId);
             const userDoc = await userRef.get();
 
             if (!userDoc.exists) {
