@@ -16,7 +16,10 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
 ```
 
-### How to set up the service account for local development?
+### How to set up the service account and environment for local development?
+
+
+Get `firebase_service_account` and API_SECRET_KEY from the admin and follow the below steps:-
 
 1. Create a folder `.firebase` in the project root directory.
 2. Add the `firebase_service_account.json` file to `.firebase` directory.
