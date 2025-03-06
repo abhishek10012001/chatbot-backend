@@ -138,8 +138,8 @@ export class ChatbotController implements ChatbotControllerInterface {
             const { userId, messageId, newText } = req.body;
 
             if (!userId || !messageId || !newText) {
-            logger.error("Either of userId, messageId or newText is missing");
-            return resp.status(400).json({ error: "Missing required parameters" });
+                logger.error("Either of userId, messageId or newText is missing");
+                return resp.status(400).json({ error: "Missing required parameters" });
             }
 
             logger.info(`UserId: ${userId}, messageId: ${messageId}, newText: ${newText}`);
@@ -148,15 +148,15 @@ export class ChatbotController implements ChatbotControllerInterface {
             const userDoc = await userRef.get();
 
             if (!userDoc.exists) {
-            logger.error(`No messages found for userId: ${userId}`);
-            return resp.status(404).json({ error: "User not found" });
+                logger.error(`No messages found for userId: ${userId}`);
+                return resp.status(404).json({ error: "User not found" });
             }
 
             const messages = userDoc.data() || {};
 
             if (!messages[messageId] || messages[messageId].by !== "user") {
-            logger.error(`MessageId: ${messageId} not found for userId: ${userId}`);
-            return resp.status(403).json({ error: "Message not found" });
+                logger.error(`MessageId: ${messageId} not found for userId: ${userId}`);
+                return resp.status(403).json({ error: "Message not found" });
             }
 
             logger.info(`Existing message details: ${JSON.stringify(messages[messageId])}`);
